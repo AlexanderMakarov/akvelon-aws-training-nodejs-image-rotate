@@ -4,11 +4,11 @@ variable "aws_region" {
   default     = "eu-west-3"
 }
 variable "aws_profile" {
-  description = "The AWS CLI profile to use for authentication"
+  description = "The AWS CLI profile to use for the authentication"
   type        = string
   default     = "alexander.makarov@akvelon.com"
 }
-variable "bucket_name" {
+variable "s3_bucket_name" {
   description = "The name of the S3 bucket to store Terraform state"
   type        = string
   default     = "akvelon-aws-training-nodejs-image-rotate-tfstate"

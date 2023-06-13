@@ -1,10 +1,12 @@
+// Needed only to prepare "state" management for the main project.
+
 provider "aws" {
   region  = var.aws_region
   profile = var.aws_profile
 }
 
 resource "aws_s3_bucket" "terraform_state" {
-  bucket = var.bucket_name
+  bucket = var.s3_bucket_name
 
   tags = {
     "project" = var.project_name
@@ -36,5 +38,25 @@ resource "aws_dynamodb_table" "terraform_locks" {
 
   tags = {
     "project" = var.project_name
+  }
+}
+
+# Run Shell script to create "backend.tfvars" for the main project.
+resource "null_resource" "generate_backend_tfvars" {
+  # Run it each "apply" call.
+  triggers = {
+    always_run = "${timestamp()}"
+  }
+  provisioner "local-exec" { # Note that command below need in Unix "cat" command and Shell pipes.
+    command = <<-EOT
+      cat > ../backend.tfvars <<EOF
+      region         = "${var.aws_region}"
+      bucket         = "${var.s3_bucket_name}"
+      key            = "terraform/terraform.tfstate"
+      dynamodb_table = "${var.dynamodb_table_name}"
+      encrypt        = true
+      profile        = "${var.aws_profile}"
+      EOF
+    EOT
   }
 }
