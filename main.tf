@@ -14,7 +14,7 @@ terraform {
 }
 
 # Create S3 bucket.
-resource "aws_s3_bucket" "s3_images" {
+resource "aws_s3_bucket" "s3_images" { # TODO add ability to provide public access to files.
   bucket = var.project_name
 }
 

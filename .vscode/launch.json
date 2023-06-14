@@ -18,7 +18,7 @@
         "sourceMaps": true,
         "smartStep": true,
         "internalConsoleOptions": "openOnSessionStart",
-        "envFile": ".env"
+        "envFile": "${workspaceFolder}/.env"
       }
     ]
   }
