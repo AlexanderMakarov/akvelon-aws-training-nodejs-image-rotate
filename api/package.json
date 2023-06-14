@@ -1,0 +1,31 @@
+{
+  "name": "api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "api.js",
+  "scripts": {
+    "build": "tsc",
+    "prestart": "npm run build",
+    "start": "node dist/server.js",
+    "dev": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/server.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.352.0",
+    "@aws-sdk/lib-storage": "^3.352.0",
+    "@types/express": "^4.17.17",
+    "@types/multer": "^1.4.7",
+    "express": "^4.18.2",
+    "formidable": "^2.1.1",
+    "multer": "^1.4.5-lts.1",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^4.6.3"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.1.3"
+  }
+}

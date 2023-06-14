@@ -35,15 +35,25 @@ For all options need:
 
 In VS Code (with debug abilities):
 
-1. Remove ".exampl" suffix for [lambdaFlipper/.env.example](/lambdaFlipper/.env.example) and update with your data.
+1. Remove ".example" suffix for [.env.example](/.env.example) and update with your data.
 2. Run 'Debug Lambda' configuration.
 
 In console:
 
 1. Go to [lambdaFlipper](/lambdaFlipper/) folder.
-2. Set in console the same environment variables as in [lambdaFlipper/.env.example](/lambdaFlipper/.env.example).
+2. Set in console the same environment variables as in [.env.example](/.env.example).
 3. Run `node testLocally.js`.
 
 ## API
 
-TODO
+In VS Code (with debug abilities):
+
+1. Remove ".example" suffix for [.env.example](/.env.example) and update with your data.
+2. Run 'Debug API' configuration. If it fails with "tsc not found" then install it globally
+   with something like `sudo npm install -g typescript`.
+
+In console:
+
+1. Go to [api](/api/) folder.
+2. Set in console the same environment variables as in [.env.example](/.env.example).
+3. Run `npm run dev`.

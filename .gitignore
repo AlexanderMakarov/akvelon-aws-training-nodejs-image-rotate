@@ -3,6 +3,7 @@
 **.zip
 **terraform.tfstate
 **node_modules
+**dist
 **.env
 .terraform.lock.hcl
 backend.tfvars

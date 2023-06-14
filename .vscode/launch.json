@@ -6,7 +6,19 @@
         "request": "launch",
         "name": "Debug Lambda",
         "program": "${workspaceFolder}/lambdaFlipper/testLocally.js",
-        "envFile": "${workspaceFolder}/lambdaFlipper/.env"
+        "envFile": "${workspaceFolder}/.env"
+      },
+      {
+        "type": "node",
+        "request": "launch",
+        "name": "Debug API",
+        "cwd": "${workspaceFolder}/api",
+        "runtimeArgs": ["-r", "ts-node/register"],
+        "args": ["src/server.ts"],
+        "sourceMaps": true,
+        "smartStep": true,
+        "internalConsoleOptions": "openOnSessionStart",
+        "envFile": ".env"
       }
     ]
   }
