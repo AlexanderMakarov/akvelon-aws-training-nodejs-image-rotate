@@ -7,8 +7,8 @@ import { handleGetTask, handlePostTask, handleGetTaskImage } from './controllers
 const app = express();
 const port = 3000;
 
-// Set up multer for file uploads
-const upload = multer({ dest: 'uploads/' });
+// Set up multer to reject files bigger than 5 MB.
+const upload = multer({ limits: {fileSize: 5 * 1024 * 1024} });
 
 // Swagger configuration options
 const swaggerOptions = {

@@ -13,9 +13,9 @@ const SQS_TASKS = process.env.SQS_TASKS
 console.log(`ENV: Region=${REGION}, S3bucket=${S3_IMAGES}, DynamoDBtable=${DYNAMODB_TASKS}, SQSqueue=${SQS_TASKS}`)
 
 // Instantiate AWS clients.
-const s3 = new S3Client({ region: REGION, logger: console });
-const dynamodb = new DynamoDBClient({ region: REGION, logger: console });
-const sqs = new SQSClient({ region: REGION, logger: console });
+const s3 = new S3Client({ region: REGION });
+const dynamodb = new DynamoDBClient({ region: REGION });
+const sqs = new SQSClient({ region: REGION });
 
 export async function getTask(taskId: number): Promise<Task> {
   return await getTaskFromDynamoDB(taskId);
@@ -25,7 +25,7 @@ export async function createTask(image: Express.Multer.File): Promise<Task> {
   var taskId = new Date().getTime() // Not reliable in scale but still.
 
   // Upload file to S3.
-  const imageKeyInS3 = await uploadS3(image, taskId) // TODO fix - makes 0 size file and not available publicly.
+  const imageKeyInS3 = await uploadS3(image, taskId) // TODO fix - not available publicly.
   const task = new Task(taskId, imageKeyInS3)
 
   // Create DynamoDB record.
@@ -56,7 +56,7 @@ export async function getTaskImage(taskId: number, isFlipped: boolean): Promise<
 }
 
 async function uploadS3(file: Express.Multer.File, taskId: number): Promise<string> {
-  const key = `${taskId}-${file.filename}`;
+  const key = `${taskId}-${file.originalname}`;
   const command = new PutObjectCommand({
     Bucket: S3_IMAGES,
     Key: key,
