@@ -2,6 +2,7 @@
 **.backup
 **.zip
 **terraform.tfstate
+**node_modules
+**.env
 .terraform.lock.hcl
-ecs/app/node_modules
 backend.tfvars

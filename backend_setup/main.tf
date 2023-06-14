@@ -3,6 +3,12 @@
 provider "aws" {
   region  = var.aws_region
   profile = var.aws_profile
+
+  default_tags {
+    tags = {
+      "project" = var.project_name
+    }
+  }
 }
 
 resource "aws_s3_bucket" "terraform_state" {
@@ -15,7 +21,6 @@ resource "aws_s3_bucket" "terraform_state" {
 
 resource "aws_s3_bucket_acl" "terraform_state_acl" {
   bucket = aws_s3_bucket.terraform_state.id
-  acl    = "private"
 }
 
 resource "aws_s3_bucket_versioning" "terraform_state_versioning" {

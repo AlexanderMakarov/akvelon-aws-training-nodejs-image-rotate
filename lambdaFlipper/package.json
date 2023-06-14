@@ -1,0 +1,15 @@
+{
+  "name": "lambdaflipper",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "run": "node testLocally.js"
+  },
+  "author": "Alexander Makarov",
+  "license": "MIT",
+  "dependencies": {
+    "aws-sdk": "^2.1397.0",
+    "sharp": "^0.32.1"
+  }
+}
