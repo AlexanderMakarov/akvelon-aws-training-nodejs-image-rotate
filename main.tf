@@ -10,12 +10,47 @@ provider "aws" {
 }
 
 terraform {
-  backend "s3" {} # Use "-backend-config" argument to populate values.
+  backend "s3" {} # Use "-backend-config" CLI argument to populate values.
 }
 
 # Create S3 bucket.
-resource "aws_s3_bucket" "s3_images" { # TODO add ability to provide public access to files.
+resource "aws_s3_bucket" "s3_images" {
   bucket = var.project_name
+}
+
+# Prepare and assign (to S3) IAM policy to get objects without credentials.
+data "aws_iam_policy_document" "s3_images_public_get" {
+  statement {
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
+    actions = [
+      "s3:GetObject", # Don't allow "list" intentionally.
+    ]
+
+    resources = [
+      "${aws_s3_bucket.s3_images.arn}/*",
+    ]
+  }
+}
+
+# https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/223
+# Need to avoid `Error putting S3 policy: AccessDenied: Access Denied` for aws_s3_bucket_policy below.
+# Reason - https://aws.amazon.com/blogs/aws/heads-up-amazon-s3-security-changes-are-coming-in-april-of-2023/
+resource "aws_s3_bucket_public_access_block" "s3_images_public_get" {
+  bucket = aws_s3_bucket.s3_images.id
+
+  block_public_acls       = false
+  block_public_policy     = false
+  ignore_public_acls      = false
+  restrict_public_buckets = false
+}
+
+resource "aws_s3_bucket_policy" "s3_images_public_get" {
+  bucket = aws_s3_bucket.s3_images.id
+  policy = data.aws_iam_policy_document.s3_images_public_get.json
 }
 
 # Create DynamoDB table.
@@ -30,15 +65,17 @@ resource "aws_dynamodb_table" "dynamodb_tasks" {
   }
 
   # Don't use rangeKey because it would require to add it into each "update" request.
-  hash_key  = "taskId"
+  hash_key = "taskId"
 }
 
 # Create SQS queue.
 resource "aws_sqs_queue" "sqs_tasks" {
-  name = var.project_name
+  name                       = var.project_name
+  visibility_timeout_seconds = 2 * 60 # Timeout in Lambda which need to read it.
 }
 
-# Prepare and attach IAM roles for Lambda function to access S3, DynamoDB, SQS.
+# Prepare IAM role for Lambda function.
+# Create and attach policies to access S3, DynamoDB, SQS.
 resource "aws_iam_role" "lambda_role" {
   name = "lambda-role"
 
@@ -56,6 +93,16 @@ resource "aws_iam_role" "lambda_role" {
     ]
   }
   EOF
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_sqs_policy_attachment" {
+  role       = aws_iam_role.lambda_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_basic_execution_policy_attachment" {
+  role       = aws_iam_role.lambda_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
 resource "aws_iam_role_policy" "lambda_s3_policy" {
@@ -77,6 +124,7 @@ resource "aws_iam_role_policy" "lambda_s3_policy" {
 }
 EOF
 }
+
 resource "aws_iam_role_policy" "lambda_dynamodb_policy" {
   name   = "lambda-dynamodb-policy"
   role   = aws_iam_role.lambda_role.name
@@ -134,7 +182,7 @@ resource "aws_lambda_function" "lambda_image_rotator" {
   }
 }
 
-# Grant the Lambda function permission to access the SQS queue
+# Grant the SQS function permission to invoke Lambda.
 resource "aws_lambda_permission" "lambda_image_rotator_sqs_permission" {
   statement_id  = "AllowExecutionFromSQS"
   action        = "lambda:InvokeFunction"
@@ -142,4 +190,11 @@ resource "aws_lambda_permission" "lambda_image_rotator_sqs_permission" {
   principal     = "sqs.amazonaws.com"
 
   source_arn = aws_sqs_queue.sqs_tasks.arn
+}
+
+# Configure Lambda function to be triggered by SQS events.
+resource "aws_lambda_event_source_mapping" "sqs_mapping" {
+  event_source_arn = aws_sqs_queue.sqs_tasks.arn
+  function_name    = aws_lambda_function.lambda_image_rotator.function_name
+  batch_size       = 10 # Default value but set it explicitly.
 }
