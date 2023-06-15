@@ -15,11 +15,11 @@ const swaggerOptions = {
   definition: {
     openapi: '3.1.0',
     info: {
-      title: 'Node.js API',
+      title: 'Server API',
       version: '1.0.0',
     },
   },
-  apis: ['./src/server.ts'],
+  apis: ['./dist/server.js'], // Use Swagger definitions from transpiled code.
 };
 
 const swaggerSpec = swaggerJsdoc(swaggerOptions);

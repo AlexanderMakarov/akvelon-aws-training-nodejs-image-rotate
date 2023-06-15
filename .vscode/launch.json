@@ -12,6 +12,7 @@
         "type": "node",
         "request": "launch",
         "name": "Debug API",
+        "preLaunchTask": "npm: build - api",
         "cwd": "${workspaceFolder}/api",
         "runtimeArgs": ["-r", "ts-node/register"],
         "args": ["src/server.ts"],

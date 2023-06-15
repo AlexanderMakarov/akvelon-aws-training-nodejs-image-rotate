@@ -23,13 +23,14 @@ Expected to be implemented on "Free Tier" https://aws.amazon.com/free
    It should use "backend.tfvars" file and output should contain "Successfully configured the backend "s3"!".
 7. Run `terraform apply` from here. It would create all AWS infra and deploy distributions on it.
 8. Open Swagger at http://localhost:4000/api-docs.
-9. Provide some picture
+9. Provide some picture into POST /tasks. It will return JSON with `taskId`.
+10. After few secods call any GET endpoint with this `taskId`.
 
 # Local testing.
 
 ## Lambda.
 
-For all options need:
+Precondition for all options:
 - Upload "test.jpg" into created S3 bucket.
 - Create DynamoDB item with "taskId=1".
 
@@ -45,6 +46,9 @@ In console:
 3. Run `node testLocally.js`.
 
 ## API
+
+Precondition for all options:
+- Successfully executed `terraform apply` from the root with commented out ECS TODO resource. 
 
 In VS Code (with debug abilities):
 

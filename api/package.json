@@ -5,13 +5,12 @@
   "main": "api.js",
   "scripts": {
     "build": "tsc",
-    "prestart": "npm run build",
     "start": "node dist/server.js",
     "dev": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/server.ts"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.352.0",
     "@aws-sdk/client-s3": "^3.352.0",
