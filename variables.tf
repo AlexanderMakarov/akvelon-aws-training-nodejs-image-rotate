@@ -13,3 +13,8 @@ variable "aws_region" {
   type        = string
   default     = "eu-west-3"
 }
+variable "my_terraform_environmnet_public_ip" {
+  description = "Public IP address to be obtained during from icanhazip"
+  type        = string
+  default     = "(known after apply)"
+}

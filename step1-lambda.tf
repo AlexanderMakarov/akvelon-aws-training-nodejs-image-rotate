@@ -77,7 +77,7 @@ resource "aws_sqs_queue" "sqs_tasks" {
 # Prepare IAM role for Lambda function.
 # Create and attach policies to access S3, DynamoDB, SQS.
 resource "aws_iam_role" "lambda_role" {
-  name = "lambda-role"
+  name = "${var.project_name}-lambda-role"
 
   assume_role_policy = <<EOF
   {
@@ -173,7 +173,7 @@ resource "aws_lambda_function" "lambda_image_rotator" {
   timeout          = 2 * 60 # 2 minutes max.
   memory_size      = 128
 
-  # Pass environment variables for S3 bucket name and DynamoDB table name
+  # Pass environment variables with S3 bucket name and DynamoDB table name.
   environment {
     variables = {
       S3_IMAGES      = aws_s3_bucket.s3_images.bucket
