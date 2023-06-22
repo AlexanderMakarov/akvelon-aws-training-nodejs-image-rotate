@@ -15,10 +15,11 @@ terraform {
 
 # Create S3 bucket.
 resource "aws_s3_bucket" "s3_images" {
-  bucket = var.project_name
+  bucket        = var.project_name
+  force_destroy = true
 }
 
-# Prepare and assign (to S3) IAM policy to get objects without credentials.
+# Prepare and assign (to S3) IAM policy to get objects inside without credentials.
 data "aws_iam_policy_document" "s3_images_public_get" {
   statement {
     principals {

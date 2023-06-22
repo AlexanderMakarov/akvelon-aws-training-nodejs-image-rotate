@@ -35,12 +35,21 @@ Note that it was tested only on Ubuntu 22.04.2 LTS. Terraform inside runs Shell 
 9. Provide some picture into POST /tasks less than 5MB in size. It will respond with JSON containing `taskId`.
 10. Call any GET endpoint with this `taskId` - Lambda takes near 2 seconds to flip image.
 
+# Clean up:
+
+1. From the root folder run `terraform destroy`.
+2. Go to [backend_setup](/backend_setup/) folder and run `terraform destroy` from here.
+   However this step may be skipped because won't affect billing.
+
 # Local testing.
 
 For local testing still need to have AWS S3 bucket, DynamoDB table. For API server need to have SQS queue as well.
 To provision these resources rename [step2-ecs.tf](/step2-ecs.tf) to don't have "*.tf" extension.
 Run `terraform apply` - it should create all these things (with name equal to `project_name` Terraform variable)
 and deploy current Lambda code which won't work without new messages into SQS queue.
+
+After deploying ASG (from [step2-ecs.tf](/step2-ecs.tf) file) it would keep one EC2 instance always working.
+It is enough to update ASG scaling "min" and "desired" properties to "0" value to stop consuming EC2 resources.
 
 ## Lambda.
 

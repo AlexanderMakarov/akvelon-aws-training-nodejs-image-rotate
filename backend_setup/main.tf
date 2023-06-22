@@ -12,11 +12,8 @@ provider "aws" {
 }
 
 resource "aws_s3_bucket" "terraform_state" {
-  bucket = var.s3_bucket_name
-
-  tags = {
-    "project" = var.project_name
-  }
+  bucket        = var.s3_bucket_name
+  force_destroy = true
 }
 
 resource "aws_s3_bucket_acl" "terraform_state_acl" {
@@ -39,10 +36,6 @@ resource "aws_dynamodb_table" "terraform_locks" {
   attribute {
     name = "LockID"
     type = "S"
-  }
-
-  tags = {
-    "project" = var.project_name
   }
 }
 

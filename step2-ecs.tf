@@ -1,6 +1,7 @@
 # Create ECR to store our Docker image.
 resource "aws_ecr_repository" "api_repo" {
-  name = var.project_name
+  name         = var.project_name
+  force_delete = true
 }
 resource "aws_ecr_lifecycle_policy" "api_repo_lifecycle_policy" {
   repository = aws_ecr_repository.api_repo.name
@@ -321,8 +322,6 @@ resource "aws_security_group_rule" "api_ec2_security_group_ssh_ingress" {
   to_port           = 22
   protocol          = "tcp"
   cidr_blocks       = ["${local.my_terraform_environmnet_public_ip}/32"]
-
-  depends_on = [aws_lb.api_load_balancer] # TODO remove
 }
 resource "aws_security_group_rule" "api_ec2_security_group_engress" {
   security_group_id = aws_security_group.api_ec2_security_group.id
@@ -331,8 +330,6 @@ resource "aws_security_group_rule" "api_ec2_security_group_engress" {
   to_port           = 0
   protocol          = "-1"
   cidr_blocks       = ["0.0.0.0/0"]
-
-  depends_on = [aws_lb.api_load_balancer] # TODO remove
 }
 
 # Network Load balancer (OSI level 4) looks better here, to don't mess with endpoints configuration of application.
@@ -402,7 +399,21 @@ resource "aws_ecs_service" "api_ecs_service" {
 }
 
 # FYI in case of error like:
-# > registering targets with target group: ValidationError: Instance ID 'akvelon-aws-training-nodejs-image-rotate' is not valid
+# > registering targets with target group: ValidationError: Instance ID '...' is not valid
 # SSH to the EC2 instance and run `tail /var/log/ecs/ecs-agent.log` on it to see what ECS agent is complying on.
 # If fix is available in-place the restart ECS agent with `sudo systemctl restart ecs`
 # See https://repost.aws/knowledge-center/ecs-container-instance-agent-error
+
+# Provide outputs. Is not in separate "outputs.tf" to keep ability omit ECS stuff by renaming only this file. 
+output "my_terraform_environmnet_public_ip" {
+  description = "The only IP allowed to make connect SSH connections to EC2."
+  value       = chomp(data.http.icanhazip.response_body)
+}
+output "api_ec2_ssh_key_file" {
+  description = "SSH key to connect to EC2 instance for troubleshooting."
+  value       = local_file.api_ec2_ssh_key_file.filename
+}
+output "api_service_url" {
+  description = "Where search a result."
+  value       = "http://${aws_lb.api_load_balancer.dns_name}:3000/api-docs"
+}
