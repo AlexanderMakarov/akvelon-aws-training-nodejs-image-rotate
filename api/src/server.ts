@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express';
 import multer from 'multer';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
+import morgan from 'morgan'
 import { handleGetTask, handlePostTask, handleGetTaskImage } from './controllers';
 
 const app = express();
@@ -9,6 +10,9 @@ const port = 3000;
 
 // Set up multer to reject files bigger than 5 MB.
 const upload = multer({ limits: {fileSize: 5 * 1024 * 1024} });
+
+// Set up requests logging.
+app.use(morgan("[:date] :remote-addr :method :url -> :status with :res[content-length] bytes length body in :response-time ms"));
 
 // Swagger configuration options
 const swaggerOptions = {
