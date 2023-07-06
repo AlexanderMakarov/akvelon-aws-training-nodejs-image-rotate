@@ -73,6 +73,7 @@ resource "aws_dynamodb_table" "dynamodb_tasks" {
 resource "aws_sqs_queue" "sqs_tasks" {
   name                       = var.project_name
   visibility_timeout_seconds = 2 * 60 # Timeout in Lambda which need to read it.
+  receive_wait_time_seconds  = 20  # Enable long polling to don't spend Free Tier in a few days.
 }
 
 # Prepare IAM role for Lambda function.
